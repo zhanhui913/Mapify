@@ -214,7 +214,7 @@
 
 			//Attach the imgViewer plugin for zooming and panning with a custon click and update callbacks
 			$img.imgViewer({
-							onClick: function(ev, imgv) { console.log("this is imgv");console.log(imgv);
+							onClick: function(ev, imgv) {
 								if (self.options.editMode) { 
 									ev.preventDefault();
 									var rpos = imgv.cursorToImg(ev.pageX, ev.pageY); console.log(rpos);
