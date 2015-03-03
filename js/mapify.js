@@ -11,7 +11,7 @@
 			zoom: 1,
 			zoomStep: 0.1,
 			zoomable: true,
-			canEdit: false,  //If this is true you can add/move/delete markers, else you can only view it.
+			//canEdit: false,  //If this is true you can add/move/delete markers, else you can only view it.
 			editMode: false, //If this is true you can add/move/delete markers, else you can only view it.
 			topLatLng: {
 				lat:0, 
