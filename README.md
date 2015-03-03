@@ -1,58 +1,56 @@
 # Mapify
-Basic map/marker functionality but on an image.
-
-Author: Zhan Yap<br/>
-License: MIT
+Basic map/marker functionality but on an image.<br/>
+This is a modification of Wayne Mogg's [imgNotes](https://github.com/waynegm/imgNotes) <br/><br/>
+**Author**: Wayne Mogg<br/>
+**Modified by** : Zhan Yap<br/>
+**License** : MIT
 
 ##Usage
 ```html
-	
-	//Include jQuery
-	<script type="text/javascript" src="js/jquery/jquery.js"></script>
+//Include jQuery
+<script type="text/javascript" src="js/jquery/jquery.js"></script>
 
-	//Include jQuery-UI for drag/drop
-	<script type="text/javascript" src="js/jquery/jquery-ui.js"></script>
+//Include jQuery-UI for drag/drop
+<script type="text/javascript" src="js/jquery/jquery-ui.js"></script>
 
-	//Include toe.js from https://github.com/visiongeist/toe.js
-	//toe.js is a tiny library based on jQuery to enable sophisticated gestures on touch devices
-	<script type="text/javascript" src="js/toe.min.js"></script>
+//Include toe.js from https://github.com/visiongeist/toe.js
+//toe.js is a tiny library based on jQuery to enable sophisticated gestures on touch devices
+<script type="text/javascript" src="js/toe.min.js"></script>
 
-	//Include jQuery Mousewheel
-	<script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
+//Include jQuery Mousewheel
+<script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
 
-	//Include imgViewer from https://github.com/waynegm/imgViewer
-	<script type="text/javascript" src="js/imgViewer.min.js"></script>
+//Include imgViewer from https://github.com/waynegm/imgViewer
+<script type="text/javascript" src="js/imgViewer.min.js"></script>
 
-	//Include the CSS
-	<style type="text/css" media="all">@import "css/marker.css";</style>
+//Include the CSS
+<style type="text/css" media="all">@import "css/marker.css";</style>
 ```
 
 Put an image element and a javascript block to attach the plugin to the image in the DOM
 ```html
-	<body>
-	    ...
-	    <img  class="image" src="example.png"/>              
-	    ...
-	    <script type="text/javascript">
-	        (function($) {
-	        	$(document).ready(function() {
-	            	$(".image").mapify();
-	        	});
-	        })(JQuery);
-	    </script>
-	    ...
-	</body>
-
+<body>
+    ...
+    <img  class="image" src="example.png"/>              
+    ...
+    <script type="text/javascript">
+        (function($) {
+            $(document).ready(function() {
+                $(".image").mapify();
+            });
+        })(JQuery);
+    </script>
+    ...
+</body>
 ```
 
 ##Options
----
 ###zoomStep
 * How much the zoom changes for each mousewheel click (positive number)
 * Default : 0.1
 * Example : To change each mousewheel click to 0.15 
 ```html
-    $(".image").mapify("option", "zoomStep", 0.15);
+$(".image").mapify("option", "zoomStep", 0.15);
 ```
 
 ###zoom
@@ -60,7 +58,7 @@ Put an image element and a javascript block to attach the plugin to the image in
 * Default : 1 (ie the entire image is visible) 
 * Example : Display the image magnified 4X
 ```html
-    $(".image").mapify("option", "zoom", 4);
+$(".image").mapify("option", "zoom", 4);
 ```
 
 ###zoomable
@@ -68,7 +66,7 @@ Put an image element and a javascript block to attach the plugin to the image in
 * Default : true
 * Example : To disable image zooming
 ```html
-    $(".image").mapify("option", "zoomable", false);
+$(".image").mapify("option", "zoomable", false);
 ```
 
 ###editMode
@@ -76,29 +74,31 @@ Put an image element and a javascript block to attach the plugin to the image in
 * Default : false
 * Example : To enable edit mode
 ```html
-    $(".image").mapify("option", "editMode", true);
+$(".image").mapify("option", "editMode", true);
 ```
 
 ###vAll
-* The vertical center point of the marker image.
-* Default : "middle"
+* Controls the vertical positioning of the marker relative to the marker location. The change only affects markers subsequently inserted
+* Valid Values: "top", "middle" or "bottom"
+* Default: "middle"
 * Example : Change the center point to "bottom"
 ```html
-    $(".image").mapify("option", "vAll", "bottom");
+$(".image").mapify("option", "vAll", "bottom");
 ```
 
 ###hAll
-* The horizontal center point of the marker image.
-* Default : "middle"
+* Controls the horizontal positioning of the marker relative to the marker location. The change only affects markers subsequently inserted
+* Valid Values: "left", "middle" or "right"
+* Default: "middle"
 * Example : Change the center point to "right"
 ```html
-    $(".image").mapify("option", "hAll", "right");
+$(".image").mapify("option", "hAll", "right");
 ```
 
 **Important** : vAll and hAll is used concurrently to determine the center point of the marker image.
 
-**Example** : 
 ![Marker](/img/markerPosition.png)
+**Example** : 
 * **1** : {vAll: "top", hAll: "left"}
 * **2** : {vAll: "top", hAll: "middle"}
 * **3** : {vAll: "top", hAll: "right"}
@@ -114,10 +114,10 @@ Put an image element and a javascript block to attach the plugin to the image in
 *  Default : {lat : 0, lng : 0}
 *  Example : Set the top left corner of the image's latitude and longitude to 49.285546 and -123.119395 respectively.
 ```html
-    $(".image").mapify("option", "topLatLng", {
-        lat: 49.285546,
-        lng : -123.119395
-    });
+$(".image").mapify("option", "topLatLng", {
+    lat: 49.285546,
+    lng : -123.119395
+});
 ```
 
 ###botLatLng
@@ -125,10 +125,10 @@ Put an image element and a javascript block to attach the plugin to the image in
 *  Default : {lat : 1, lng : 1}
 *  Example : Set the bottom right corner of the image's latitude and longitude to 49.284271 and -123.117394 respectively.
 ```html
-    $(".image").mapify("option", "botLatLng", {
-        lat: 49.284271,
-        lng : -123.117394
-    });
+$(".image").mapify("option", "botLatLng", {
+    lat: 49.284271,
+    lng : -123.117394
+});
 ```
 
 ###markersLatLng
@@ -136,42 +136,85 @@ Put an image element and a javascript block to attach the plugin to the image in
 * Default : [{lat : 0.5, lng : 0.5, note : "Default note."}]
 * Example : Add 2 markers.
 ```html
-    $(".image").mapify("option", "markersLatLng", [
-        {lat : 49.284893 , lng : -123.118376, note : "Intersection"},
-        {lat : 49.285524 , lng : -123.118718, note : "Cactus Club" }
-    ]);
+$(".image").mapify("option", "markersLatLng", [
+    {lat : 49.284893 , lng : -123.118376, note : "Intersection"},
+    {lat : 49.285524 , lng : -123.118718, note : "Cactus Club" }
+]);
 ```
 
-###onClick
-* Callback triggered by a mouseclick on the image
-* Default : null
-* Callback arguments :
-    * e : the original click event object
-    * self :  the mapify widget object issuing the click event
-* Example : Adding a marker to the spot where the cursor was clicked.
+###onAdd
+* Callback triggered when a marker/note is added to the widget to allow developers to define their own markers. This will happen when notes are imported using the "import" method and when the user clicks on the widget in edit mode. Within the callback "this" refers to the imgNotes widget.
+* Default: Inserts a numbered inverted black teardrop image aligned to point at the insertion point
+* Callback Arguments: none
+* Callback Returns: the new marker element
+* Example:
 ```html
-    $(".image").mapify("option", "onClick", function(e, self){
-        var rpos = self.cursorToImg(e.pageX, e.pageY);
-        self.addMarker(rpos.x, rpos.y);
-        self.options.onUpdate.call(self);
-    });
+$(".image").imgNotes("option", "onAdd", function() {
+    this.options.vAll = "bottom";
+    this.options.hAll = "middle";
+    return  $(document.createElement('span')).addClass("marker notSelected").html(this.markerCount);
+});
+```
+
+###onEdit (might delete)
+* Callback triggered by a mouseclick on the image, to insert a new marker/note, or on an exisitng marker to edit the note when the widget is in edit mode (canEdit: true). Please use the default implementation as a guide to implement a custom interface.
+* Default: Open a dialog box with a simple textarea to add/edit the note
+* Callback Arguments:
+    * ev: the click event
+    * elem: the marker DOM element
+
+###onEditMarker
+* Callback triggered by a mouseclick on the marker, to select it or deselect it when the widget is in edit Mode (editMode: true).
+* Default : Draws a dashed border around the marker when selected, otherwise empty.
+* Callback Arguments:
+    * ev: the click event
+    * elem: the marker DOM element
+
+###onShow
+* Callback triggered by a mouseclick on an existing marker when the widget is in view mode (canEdit: false). Please use the default implementation as a guide to implement a custom interface.
+* Default: Open a dialog box to show the note
+* Callback Arguments:
+    * ev: the click event
+    * elem: the marker DOM element
+    
+###onUpdateMarker
+* Callback triggered when a marker is redrawn. Within the callback "this" refers to the imgNotes widget.
+* Default: Display the marker at its original size on the image positioned according to the vAll and hAll alignment options
+* Callback Arguments:
+    * elem: the marker DOM element
+* Example
+```html
+$(".image").mapify({
+        onUpdateMarker: function(elem) {
+            var $elem = $(elem);
+            var $img = $(this.img);
+            var pos = $img.imgViewer("imgToView", $elem.data("relx"), $elem.data("rely"));
+            var zoom = $img.imgViewer("option", "zoom");
+            if (pos) {
+                $elem.css({
+                    left: (pos.x - $elem.data("xOffset")),
+                    top: (pos.y - $elem.data("yOffset")),
+                    position: "absolute",
+                    transform: "scale(" + zoom + "," + zoom + ")"
+                });
+            }
+        }
+});
 ```
 
 ###onUpdate
-* Callback triggered after the image has been redisplayed (repainted)
-* Default : null
-* Callback arguments :
-    * e : always null
-    * self: the mapify widget object issuing the update notice
-* Example : To display the relative image coordinates clicked (relative image coordinates ranges from 0 to 1 where the top left is (0,0) and bottom right is (1,1))
+* Callback triggered when the view is redrawn. Within the callback "this" refers to the imgNotes widget.
+* Default: Display the markers by calling onUpdateMarker for each note
+* Example
 ```html
-    $(".image").mapify("option", "onUpdate", function(e, self){
-        var pos = {
-                    relx : self.vCenter.x/$(self.img).width(),
-                    rely : self.vCenter.y/$(self.img).height()
-                    };
-        $("#centre_position").html(pos.relx + "," + pos.rely);
-    });
+$(".image").imgNotes({
+        onUpdate: function() {
+                var self = this;
+                $.each(this.marker, function() {
+                    self.options.onUpdateMarker.call(self, this);
+                });
+            }
+});
 ```
 
 ###onDragStart
@@ -215,3 +258,116 @@ Put an image element and a javascript block to attach the plugin to the image in
         ...
     });
 ```
+
+##Public Methods
+###addMarker (needs to edit)
+* Add a marker to the image.
+    * Triggers the "onAdd" callback to insert the markup for the marker
+    * Stores the marker location, id and text into the marker element
+* Binds the click event of the marker element to trigger the onShow or onEdit callbacks dependant on the editMode option.
+* Arguments:
+    * relx: relative x image coordinate for the marker
+    * rely: relative y image coordinate for the marker
+    * note: the note text which can include html
+* Returns the marker element
+* Example
+```html
+elem = $(".image").mapify("addNote", 0.5,0.5,"Default note.");
+```
+
+###count
+* Get the number of markers in the widget
+* Arguments: none
+* Returns: the number of markers in the widget
+* Example
+```html
+count = $(".image").mapify("count");
+```
+
+###clear
+* Delete all the markers from the widget
+* Arguments: none
+* Returns: the widget object for chainability
+* Example
+```html
+$(".image").mapify("clear");
+```
+
+###resetSelected
+* Resets all marker's "selected" data to false
+* Arguments: none
+* Returns : none
+* Example
+```html
+$(".image").mapify("resetSelected");
+```
+
+###import (might delete)
+* Add markers from a javascript array to the widget
+* Arguments - a javascript array of marker objects: javascript [ { x: relative x image coordinate, y: relative y image coordinate, note: the note text },... ] 
+* Returns: the widget object for chainability
+* Example
+```html
+$(".image").mapify("import", [ 
+    {x: 0.5, y:0.5, note:"AFL Grand Final Trophy"}, 
+    {x: "0.322", y:"0.269", note: "Brisbane Lions Flag"},
+    {x: "0.824", y: "0.593", note: "Fluffy microphone"}
+]);
+```
+
+###importLatLng
+* Add markers from a javascript array to the widget
+* Arguments - a javascript array of marker objects : javascript [{lat: ..., lng: ..., note: the note text },...]
+* Returns: the widget object for chainability
+* Example
+```html
+$img.mapify("importLatLng", [
+    {lat: 49.284893, lng:-123.118376, note:"Intersection"},
+    {lat: 49.285524, lng:-123.118718, note:"Cactus Club"},
+    {lat:49.285022 , lng: -123.118267, note:"Brandi Show Lounge"}
+]);
+```
+
+###export
+* Export markers in the widget to a javascript array
+* Arguments: none
+* Returns - a javascript array of marker objects: javascript [{ x: relative x image coordinate, y: relative y image coordinate, note: the note text }, ... ] 
+* Example:
+```html
+markers = $(".image").mapify("export");
+```
+
+###panTo
+* Pan the view to be centred at the given relative image coordinates
+* Arguments: relx: relative x image coordinate rely: relative y image coordinate
+* Returns a javascript object with the relative image coordinates of the view centre after snapping the edges of the zoomed image to the view boundaries.
+```html   
+{ 
+    x: view center relative x image coordinate, 
+    y: view center relative y image coordinate
+}
+```
+* Returns null if the relative image coordinates are not >=0 and <=1 and the view is not changed.
+* Example:
+```html
+$(".image").mapifys("panTo", 0.5,0.0);
+```
+
+##License
+This plugin is provided under the [MIT License](http://opensource.org/licenses/MIT). 
+
+##Release History
+###0.1
+* Working release.
+
+###0.2
+* Create marker when onClick anywhere on the image and retrieving the correct latitide and longitude.
+
+###0.3
+* Ability to select marker and draw border around it to display to user that this marker is selected.
+* Can drag and drop marker, but have to select the marker first.
+* Drop marker into the correct latitude and longitude and have it remain there after redrawing.
+
+
+
+
