@@ -11,7 +11,6 @@
 			zoom: 1,
 			zoomStep: 0.1,
 			zoomable: true,
-			//canEdit: false,  //If this is true you can add/move/delete markers, else you can only view it.
 			editMode: false, //If this is true you can add/move/delete markers, else you can only view it.
 			topLatLng: {
 				lat:0, 
@@ -44,47 +43,11 @@
 				this.options.hAll = "middle";
 				return  $(document.createElement('span')).addClass("marker notSelected").html(this.markerCount);
 			},
-/*
- *	Default callback when the marker is clicked and the widget has canEdit = true
- *	Opens a dialog with a textarea to write a note.
- *	See the examples for a more elaborate alternative that includes a WYSIWYG editor
- */
-			onEdit: function(ev, elem) {
-				var $elem = $(elem);
-				$('#NoteDialog').remove();
-				return $('<div id="NoteDialog"></div>').dialog({
-					title: "Note Editor",
-					resizable: false,
-					modal: true,
-					height: "300",
-					width: "450",
-					position: { my: "left bottom", at: "right top", of: elem},
-					buttons: {
-						"Save": function() {
-							var txt = $('textarea', this).val();
-//			Put the editied note back into the data area of the element
-//			Very important that this step is included in custom callback implementations
-							$elem.data("note", txt);
-							$(this).dialog("close");
-						},
-						"Delete": function() {
-							$elem.trigger("remove");
-							$(this).dialog("close");
-						},
-						Cancel: function() {
-							$(this).dialog("close");
-						}
-					},
-					open: function() {
-						$(this).css("overflow", "hidden");
-						var textarea = $('<textarea id="txt" style="height:100%; width:100%;">');
-						$(this).html(textarea);
-//			Get the note text and put it into the textarea for editing
-						textarea.val($elem.data("note"));
-					}
-				});				
-			},
-			onEditMarker:function(ev,elem){ //testing, remove when done
+
+			/*
+			 * Handles the onClickMarker's changes in data and CSS
+			 */
+			onEditMarker:function(ev,elem){
 				console.log(elem);
 				var $elem = $(elem.selected);
 				var $allElem = $(elem.all); 
@@ -97,13 +60,15 @@
 					$elem1.data("selected",false);
 					var pos = $img.imgViewer("imgToView",$elem1.data("relx"),$elem1.data("rely"));
 					if(pos){
+						$elem1Id = $elem1.data("id");
+						$elemId = $elem.data("id");
 						if($elem1.data("id")==$elem.data("id")){ console.log("Enable dragging for marker "+$elem.data("id"));
 							$elem1.data("selected",true);
 							//Enable dragging
 							$elem1.draggable("enable");
 							$elem1.removeClass("notSelected");
 							$elem1.addClass("selected");
-						}else{
+						}else{ console.log("Disable dragging for marker "+$elem.data("id"));
 							//Disable dragging
 							$elem1.draggable("disable");
 							$elem1.removeClass("selected");
@@ -111,47 +76,19 @@
 						}
 					}
 				});
-
-				console.log("selected marker - "+$elem.data("id"));
+				//console.log("selected marker - "+$elem.data("id"));
 			},
-			onDragStart:function(){ console.log("on drag start");
+			onDragStart:function(){ 
 				//Nothing by default
+				
 			},
-			onDrag:function(){ console.log("on drag");
+			onDrag:function(){
 				//Nothing by default
+				
 			},
-			onDragStop:function(){ console.log("on drag stop");
+			onDragStop:function(){
 				//Nothing by default
-			},
-/*
- *	Default callback when the marker is clicked and the widget has canEdit = false
- *	Opens a dialog displaying the contents of the marker's note
- *	See examples for alternatives such as using tooltips.
- */
-			onShow: function(ev, elem) {
-				var $elem = $(elem);
-				$('#NoteDialog').remove();
-				return $('<div id="NoteDialog"></div>').dialog({
-					modal: false,
-					resizable: false,
-					height: 300,
-					width: 250,
-					position: { my: "left bottom", at: "right top", of: elem},
-					buttons: {
-						"Close" : function() {
-							$(this).dialog("close");
-						}
-					},
-					open: function() {
-//Get the note text and put it into the textarea for editing
-						$(this).html($elem.data("note"));
-						$(this).closest(".ui-dialog").find(".ui-dialog-titlebar:first").hide();
-						
-					},
-					close: function() {
-						$(this).dialog("destroy");
-					}
-				});
+				
 			},
 
 			/*
@@ -178,7 +115,7 @@
 			/*
 			 *	Default callback when the image view is repainted
 			 */
-			onUpdate: function() { console.log("update");
+			onUpdate: function() {
 				var self = this;
 				$.each(this.marker, function() {
 					self.options.onUpdateMarker.call(self, this);
@@ -220,8 +157,6 @@
 									var rpos = imgv.cursorToImg(ev.pageX, ev.pageY); console.log(rpos);
 									if (rpos) {
 										var elem = self.addMarker(rpos.x, rpos.y);
-										//self._trigger("onEdit", ev, elem);
-										//self._trigger("onEditMarker",ev,elem);
 										self.options.onUpdate.call(self); //Repaint after adding a marker
 									}
 								}
@@ -235,7 +170,7 @@
 							zoomable: self.options.zoomable
 			});
 
-			//Have the image a droppable object so that markers can be dropped after dragging.
+			//Have the image a droppable object so that markers can be dropped onto it.
 			$img.droppable({
 				drop: function(ev,ui){
 					var yOffset = ui.draggable.data("yOffset");
@@ -344,14 +279,12 @@
 			//Handle onClick on markers
 			$elem.click(function(ev) {
 				ev.preventDefault();
-				if (self.options.editMode) {
-					//self._trigger("onEdit", ev, elem);
-					console.log("there are a total of "+self.marker.length+" markers");
-					
+				if (self.options.editMode) {					
 					var selectedItem = (elem.data("selected"))? null : elem;
-					self._trigger("onEditMarker",ev,{all:self.marker, selected:selectedItem});
-				} else {
-					//self._trigger("onShow", ev, elem);
+					self._trigger("onEditMarker",ev,{
+						all : self.marker, 
+						selected : selectedItem
+					});
 				}
 			});	
 
@@ -371,7 +304,7 @@
 			$elem.on("remove", function() {
 				self._delete(elem);
 			});
-//			self.options.onUpdateMarker.call(self, elem);
+			//self.options.onUpdateMarker.call(self, elem);
 			
 			self.marker.push(elem);
 			return elem;
