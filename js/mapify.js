@@ -25,7 +25,7 @@
 				lng:0.5,
 				note:"Default note."
 			}],
-			marker: {
+			markerSrc: {
 				src:"marker_black.png",
 				width:27,
 				height:40,
@@ -41,54 +41,57 @@
 			onAdd: function() {
 				this.options.vAll = "bottom";
 				this.options.hAll = "middle";
-				return  $(document.createElement('span')).addClass("marker notSelected").html(this.markerCount);
+				return  $(document.createElement('span')).addClass("marker").html(this.markerCount);
 			},
 
 			/*
-			 * Handles the onClickMarker's changes in data and CSS
+			 * Handles the onClick Marker's changes in data and CSS
 			 */
-			onEditMarker:function(ev,elem){
-				console.log(elem);
-				var $elem = $(elem.selected);
-				var $allElem = $(elem.all); 
-				var toggle = elem.toggle;
+			onEditMarker:function(ev,elem){ 
+				var $elem = $(elem.selected); console.log("marker selected is id = "+$elem.data("id"));
+				var $markerList = $(elem.all); console.log($markerList);
 				var $img = $(this.img);
-
+				
 				//Reset all previous "selected" data on the markers
-				$.each($allElem, function() { 
+				$.each($markerList, function() { 
 					var $elem1 = $(this);
-					$elem1.data("selected",false);
 					var pos = $img.imgViewer("imgToView",$elem1.data("relx"),$elem1.data("rely"));
-					if(pos){
+					if(pos){ //This makes sure the marker is inside the viewport
+						//$elem1.draggable("enable");
 						$elem1Id = $elem1.data("id");
-						$elemId = $elem.data("id");
-						if($elem1.data("id")==$elem.data("id")){ console.log("Enable dragging for marker "+$elem.data("id"));
+						$elemId = $elem.data("id"); console.log("comparing marker "+$elemId+" with marker "+$elem1Id);
+						if($elem1.data("id") === $elem.data("id")){ console.log("Enable dragging for marker "+$elem1Id);
 							$elem1.data("selected",true);
 							//Enable dragging
 							$elem1.draggable("enable");
-							$elem1.removeClass("notSelected");
 							$elem1.addClass("selected");
-						}else{ console.log("Disable dragging for marker "+$elem.data("id"));
+						}else{ console.log("Disable dragging for marker "+$elem1Id);
+							$elem1.data("selected",false);
 							//Disable dragging
 							$elem1.draggable("disable");
 							$elem1.removeClass("selected");
-							$elem1.addClass("notSelected");
 						}
 					}
 				});
+				console.log("------------------Done comparing------------------");
+				
 				//console.log("selected marker - "+$elem.data("id"));
 			},
-			onDragStart:function(){ 
+			onDragStart:function(e){ 
 				//Nothing by default
 				
 			},
-			onDrag:function(){
+			onDrag:function(e){
+				//Nothing by default
+	
+			},
+			onDragStop:function(e){
 				//Nothing by default
 				
 			},
-			onDragStop:function(){
-				//Nothing by default
-				
+			onMarkerClick:function(e){
+				//Default onMarkerClick
+				console.log("default on marker click");
 			},
 
 			/*
@@ -101,11 +104,11 @@
 				if (pos) {
 					$elem.css({
 						//Marker's CSS property
-						'background-image': 'url('+this.options.marker.src+')',
-						'font-size':this.options.marker.textSize+'px',
-						color:this.options.marker.textColor,
-						width:this.options.marker.width+"px",
-						height:this.options.marker.height+"px",
+						'background-image': 'url('+this.options.markerSrc.src+')',
+						'font-size':this.options.markerSrc.textSize+'px',
+						color:this.options.markerSrc.textColor,
+						width:this.options.markerSrc.width+"px",
+						height:this.options.markerSrc.height+"px",
 						left: (pos.x - $elem.data("xOffset")),
 						top: (pos.y - $elem.data("yOffset")),
 					});
@@ -156,7 +159,8 @@
 									ev.preventDefault();
 									var rpos = imgv.cursorToImg(ev.pageX, ev.pageY); console.log(rpos);
 									if (rpos) {
-										var elem = self.addMarker(rpos.x, rpos.y);
+										var latLng = self.convertPercentToLatLng(rpos.x, rpos.y);
+										var elem = self.addMarker(rpos.x, rpos.y, latLng.lat, latLng.lng, "");
 										self.options.onUpdate.call(self); //Repaint after adding a marker
 									}
 								}
@@ -178,8 +182,9 @@
 
 					var rpos = $(self.img).imgViewer("viewToImg",ui.position.left+xOffset, ui.position.top+yOffset);
 
+					var latLng = self._trigger("convertPercentToLatLng", rpos.x, rpos.y);
 					//Update the marker's new position
-					ui.draggable.data("relx",rpos.x).data("rely",rpos.y);
+					ui.draggable.data("relx",rpos.x).data("rely",rpos.y).data("lat",latLng.lat).data("lng",latLng.lng);
 				}
 			});	
 
@@ -203,15 +208,24 @@
 		 */
 		resetSelected:function(){ console.log("reseting selected");			
 			var self = this;
-			
-			$.each(self.marker, function() { 
+			$.each(self.marker, function(){
 				var $elem = $(this);
 				$elem.data("selected",false);
 				$elem.removeClass("selected");
-				$elem.addClass("notSelected");
 			});
 		},
 		
+		convertPercentToLatLng:function(relx, rely){
+			var self = this; console.log("2) "+relx+","+rely);
+			var lat = relx * (self.options.botLatLng.lat - self.options.topLatLng.lat) + self.options.topLatLng.lat;
+			var lng = rely * (self.options.botLatLng.lng - self.options.topLatLng.lng) + self.options.topLatLng.lng;
+			return {"lat": this.roundToX(lat,6), "lng": this.roundToX(lng,6)};
+		},
+
+		roundToX:function(value, decimals){
+			return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+		},
+
 		_setOption: function(key, value) {
 			switch(key) {
 				case 'vAll':
@@ -258,47 +272,65 @@
 		/*
 		 *	Add a marker
 		 */
-		addMarker: function(relx, rely, text) { console.log("adding marker");
+		addMarker: function(relx, rely, lat, lng, text) { console.log("adding marker");
 			var self = this;
 			self.markerCount++;
 			var elem = this.options.onAdd.call(this);
 			var $elem = $(elem);
 			$(this.img).imgViewer("addElem",elem);
-			$elem.data("relx", relx).data("rely", rely).data("note", text).data("selected",false).data("id",self.markerCount);
+			$elem.data("relx", relx)
+				.data("rely", rely)
+				.data("lat", lat)
+				.data("lng", lng)
+				.data("note", text)
+				.data("selected",false)
+				.data("id",self.markerCount);
 			
 			switch (this.options.vAll) {
 				case "top": $elem.data("yOffset", 0); break;
-				case "bottom": $elem.data("yOffset", self.options.marker.height); break;
-				default: $elem.data("yOffset", Math.round(self.options.marker.height/2));
+				case "bottom": $elem.data("yOffset", self.options.markerSrc.height); break;
+				default: $elem.data("yOffset", Math.round(self.options.markerSrc.height/2));
 			}
 			switch (this.options.hAll) {
 				case "left": $elem.data("xOffset", 0); break;
-				case "right": $elem.data("xOffset", self.options.marker.width); break;
-				default: $elem.data("xOffset", Math.round(self.options.marker.width/2));
+				case "right": $elem.data("xOffset", self.options.markerSrc.width); break;
+				default: $elem.data("xOffset", Math.round(self.options.markerSrc.width/2));
 			}
 			//Handle onClick on markers
 			$elem.click(function(ev) {
 				ev.preventDefault();
 				if (self.options.editMode) {					
-					var selectedItem = (elem.data("selected"))? null : elem;
-					self._trigger("onEditMarker",ev,{
-						all : self.marker, 
-						selected : selectedItem
-					});
+					var selectedItem = ($elem.data("selected"))? null : elem;
+					self._trigger("onEditMarker",ev,{selected:selectedItem, all: self.marker});
+					self.options.onMarkerClick($elem);
 				}
 			});	
 
 			//Handle dragging (default to disabled)
 			$elem.draggable({
-				//containment:".viewport",
 				addClasses: false,
 				cursor: "pointer",
-				disabled: false,
+				//disabled: false,
 				opacity: 1, //not sure if this works
 				stack: "span", //Ensures whatever marker that is being dragged will appear on top of all other markers ie: z-index
-				start: this.options.onDragStart,
-				drag: this.options.onDrag,
-				stop: this.options.onDragStop,
+				start: function(ev, ui){
+					self.options.onDragStart({target: $(this)});
+				},
+				drag: function(ev, ui){
+					var yOffset = $(this).data("yOffset");
+					var xOffset = $(this).data("xOffset");
+
+					var rpos = $(self.img).imgViewer("viewToImg",ui.position.left+xOffset, ui.position.top+yOffset);
+					//console.log("rpos.x ="+rpos.x+", rpos.y ="+rpos.y);
+					var latLng = self.convertPercentToLatLng(rpos.x, rpos.y); console.log("lat -"+latLng.lat+", lng -"+latLng.lng);
+					//Update the marker's new position
+					$(this).data("relx",rpos.x).data("rely",rpos.y).data("lat",latLng.lat).data("lng",latLng.lng);
+
+					self.options.onDrag({target: $(this)});
+				},
+				stop: function(ev, ui){
+					self.options.onDragStop({target: $(this)});
+				},
 			});	
 			$elem.draggable("disable");
 			$elem.on("remove", function() {
@@ -324,6 +356,12 @@
 			this.marker = this.marker.filter(function(v) { return v!== elem; });
 			$(elem).remove();
 			$(this.img).imgViewer("update");
+		},
+
+		deleteMarker:function(elem){
+			this.marker = this.marker.filter(function(v) { return v.data("id")!= elem.data("id"); }); 
+			$(elem).detach();
+			$(this.img).imgViewer("update"); console.log("after deleting 1 marker, there is "+this.marker.length+" markers left");
 		},
 		
 		/*
@@ -366,7 +404,7 @@
 				
 				console.log("x% = "+percentX+", y% = "+percentY);
 				console.log("----------------------------------------");
-				self.addMarker(percentX,percentY,this.note);
+				self.addMarker(percentX, percentY, this.lat, this.lng, this.note);
 			});
 			$(this.img).imgViewer("update");
 		},
@@ -379,12 +417,29 @@
 			$.each(this.marker, function() {
 				var $elem = $(this);
 				marker.push({
+						id: $elem.data("id"),
 						x: $elem.data("relx"),
 						y: $elem.data("rely"),
-						note: $elem.data("note")
+						lat: $elem.data("lat"),
+						lng: $elem.data("lng"),
+						note: $elem.data("note"),
+						selected : $elem.data("selected")
 				});
 			});
 			return marker;
-		}
+		},
+
+		exportMarker:function(){
+			return this.marker;
+		},
+
+		printSelected: function(){ //Debug only
+			$.each(this.marker,function(){
+				var $elem = $(this);
+				console.log("Marker id = "+$elem.data("id")+" has selected = "+$elem.data("selected")+", draggable is disabled : "+$elem.draggable("option","disabled"));
+			});
+		},
+
+
 	});
 })(jQuery);

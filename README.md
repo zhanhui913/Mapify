@@ -97,7 +97,7 @@ $(".image").mapify("option", "hAll", "right");
 
 **Important** : vAll and hAll is used concurrently to determine the center point of the marker image.
 
-![Marker](/img/markerPosition.png)
+![Marker](/img/markerPosition.png)<br/>
 **Example** : 
 * **1** : {vAll: "top", hAll: "left"}
 * **2** : {vAll: "top", hAll: "middle"}

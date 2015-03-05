@@ -20,15 +20,20 @@
 		</p>
 		<div class="mapify" style="text-align: center">
 			<div><p>TopLeft Latitude :</p><input type="number" id="topLeftLat" disabled> <p>TopLeft Longitude :</p><input type="number" id="topLeftLng"  disabled></div>
-			<div><p>Marker Latitude :</p><input type="number" id="markerLat"> <p>Marker Longitude :</p><input type="number" id="markerLng"></div>
+			<div><p>Marker Latitude :</p><input type="number" id="selectedMarkerLat"> <p>Marker Longitude :</p><input type="number" id="selectedMarkerLng"></div>
 			<div><p>BottomRight Latitude :</p><input type="number" id="bottomRightLat" disabled> <p>BottomRight Longitude :</p><input type="number" id="bottomRightLng"  disabled></div>
 			<button id="editMode">Edit</button>
+			<button id="deleteMarker" class="s">Delete</button>
 			<br></br>
 			<img class="image" src="img/vancouverMap.jpg" />
 		</div>
 		<script type="text/javascript">
 		(function($) {
 			$(document).ready(function() {
+
+				var $markerLat = $("#selectedMarkerLat");
+				var $markerLng = $("#selectedMarkerLng");
+
 				var $img = $(".image").mapify({
 							topLatLng:{lat:49.285546, lng:-123.119395},
 							botLatLng:{lat:49.284271, lng:-123.117394},
@@ -37,19 +42,19 @@
 								{lat: 49.285524, lng: -123.118718, note: "Cactus Club"},
 								{lat: 49.285022, lng: -123.118267, note: "Brandi Show Lounge"}
 							],
-							marker:{
+							markerSrc:{
 								src:"img/marker.png",
 								width:27,
 								height:40,
 								textColor:'#F0F',
 								textSize:15
 							},
-							zoomable:true,
+							zoomable:false,
 							onShow: $.noop, //jQuery's default empty function - $.noop
 							onAdd: function() {
 								this.options.vAll = "bottom";
 								this.options.hAll = "middle";
-								var elem = $(document.createElement('span')).addClass("marker notSelected").html(this.markerCount).attr("title", "");
+								var elem = $(document.createElement('span')).addClass("marker").html(this.markerCount).attr("title", "");
 								var self = this;
 								$(elem).tooltip({
 									content: function() {
@@ -58,9 +63,18 @@
 								});
 								return elem;
 							},
-							onDragStart:function(){},
-							onDrag:function(){},
-							onDragStop:function(){},
+							onDragStart:function(e){},
+							onDrag:function(e){
+								//Display marker's latitude and longitude while dragging onto the textbox
+								$markerLat.val(e.target.data("lat"));
+								$markerLng.val(e.target.data("lng"));
+							},
+							onDragStop:function(e){},
+							onMarkerClick:function(e){
+								//Display marker's current latitude and longitude onto the textbox
+								$markerLat.val(e.data("lat"));
+								$markerLng.val(e.data("lng"));	
+							},
 				});
 
 				var $toggle = $("#editMode");
@@ -80,13 +94,28 @@
 						$img.mapify("resetSelected");
 					}
 				});
-				//Can also use this way to add markers
-				/*$img.mapify("importLatLng", [
-					//{lat: 49.284893, lng:-123.118376, note:"Intersection"},
-					//{lat: 49.285524, lng:-123.118718, note:"Cactus Club"},
-					//{lat:49.285022 , lng: -123.118267, note:"Brandi Show Lounge"}
-				]);
-				*/
+
+				var $deleteMarker = $("#deleteMarker");
+				$deleteMarker.on("click",function(){
+					//Find the selected marker
+					$markerArray = $img.mapify("exportMarker");
+					$.each($markerArray, function(){ 
+						var $elem = $(this); 
+						console.log($elem.data("id"));
+						//console.log("going through id "+$elem[0].id);
+						/*if($elem[0].selected){ console.log("id "+$elem[0].id+" is selected");
+							$img.mapify("deleteMarker",$elem);
+						}*/
+						if($elem.data("selected")){
+							$img.mapify("deleteMarker",$elem);
+							return false;
+						}
+					}); console.log("done deleting marker");
+					
+					//$img.mapify("printSelected");//debug 
+				});
+
+
 		  	});
 		})(jQuery);
 		</script>
