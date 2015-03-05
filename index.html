@@ -28,9 +28,9 @@
 			<img class="image" src="img/vancouverMap.jpg" />
 		</div>
 		<script type="text/javascript">
+		
 		(function($) {
 			$(document).ready(function() {
-
 				var $markerLat = $("#selectedMarkerLat");
 				var $markerLng = $("#selectedMarkerLng");
 
@@ -64,7 +64,7 @@
 								return elem;
 							},
 							onDragStart:function(e){},
-							onDrag:function(e){
+							onDrag:function(e){ 
 								//Display marker's latitude and longitude while dragging onto the textbox
 								$markerLat.val(e.target.data("lat"));
 								$markerLng.val(e.target.data("lng"));
@@ -72,11 +72,18 @@
 							onDragStop:function(e){},
 							onMarkerClick:function(e){
 								//Display marker's current latitude and longitude onto the textbox
-								$markerLat.val(e.data("lat"));
-								$markerLng.val(e.data("lng"));	
+								if(e !== null){
+									$markerLat.val(e.data("lat"));
+									$markerLng.val(e.data("lng"));
+								}else{
+									$markerLat.val(null);
+									$markerLng.val(null);
+								}
+								
 							},
 				});
 
+				//Handles toggle mode between Edit/View
 				var $toggle = $("#editMode");
 				if($img.mapify("option","editMode")){
 					$toggle.text("View");
@@ -95,17 +102,14 @@
 					}
 				});
 
+				//Handles deleting markers
 				var $deleteMarker = $("#deleteMarker");
 				$deleteMarker.on("click",function(){
 					//Find the selected marker
 					$markerArray = $img.mapify("exportMarker");
 					$.each($markerArray, function(){ 
 						var $elem = $(this); 
-						console.log($elem.data("id"));
-						//console.log("going through id "+$elem[0].id);
-						/*if($elem[0].selected){ console.log("id "+$elem[0].id+" is selected");
-							$img.mapify("deleteMarker",$elem);
-						}*/
+						//console.log($elem.data("id"));
 						if($elem.data("selected")){
 							$img.mapify("deleteMarker",$elem);
 							return false;
@@ -115,7 +119,17 @@
 					//$img.mapify("printSelected");//debug 
 				});
 
-
+				//Handles input mode for selected marker
+				$markerLat.keypress(function(event){ console.log(String.fromCharCode(event.which));
+					if(event.which != 46 && event.which != 8 && isNaN(String.fromCharCode(event.which))){
+            			event.preventDefault();
+        			}
+				});
+				$markerLng.keypress(function(event){
+					if(event.which != 46 && event.which != 8 && isNaN(String.fromCharCode(event.which))){
+            			event.preventDefault();
+        			}
+				});
 		  	});
 		})(jQuery);
 		</script>

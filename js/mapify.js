@@ -74,20 +74,16 @@
 					}
 				});
 				console.log("------------------Done comparing------------------");
-				
 				//console.log("selected marker - "+$elem.data("id"));
 			},
 			onDragStart:function(e){ 
 				//Nothing by default
-				
 			},
 			onDrag:function(e){
 				//Nothing by default
-	
 			},
 			onDragStop:function(e){
 				//Nothing by default
-				
 			},
 			onMarkerClick:function(e){
 				//Default onMarkerClick
@@ -140,6 +136,9 @@
 			//The original img element
 			self.img = self.element[0];
 			var $img = $(self.img);
+
+			//Boolean to prevent mouseUp from triggering onClick when dragging finishes
+			self.isDragging = false;
 
 			//Set the lat lng for top left and bottom right of image
 			var $topLat = $('#topLeftLat'); 
@@ -203,8 +202,12 @@
 			$.Widget.prototype.destroy.call(this);
 		},
 
+		/*moveMarker:function(elem, lat, lng){
+
+		},*/
+
 		/*
-		 * Resets "selected"'s data and the css for all markers
+		 * Resets every marker's "selected"'s data, disable dragging, and its CSS
 		 */
 		resetSelected:function(){ console.log("reseting selected");			
 			var self = this;
@@ -212,14 +215,15 @@
 				var $elem = $(this);
 				$elem.data("selected",false);
 				$elem.removeClass("selected");
+				$elem.draggable("disable");
 			});
 		},
 		
 		convertPercentToLatLng:function(relx, rely){
-			var self = this; console.log("2) "+relx+","+rely);
+			var self = this;
 			var lat = relx * (self.options.botLatLng.lat - self.options.topLatLng.lat) + self.options.topLatLng.lat;
 			var lng = rely * (self.options.botLatLng.lng - self.options.topLatLng.lng) + self.options.topLatLng.lng;
-			return {"lat": this.roundToX(lat,6), "lng": this.roundToX(lng,6)};
+			return {lat: this.roundToX(lat,6), lng: this.roundToX(lng,6)};
 		},
 
 		roundToX:function(value, decimals){
@@ -299,10 +303,12 @@
 			//Handle onClick on markers
 			$elem.click(function(ev) {
 				ev.preventDefault();
-				if (self.options.editMode) {					
+				if (self.options.editMode && !self.isDragging) {
 					var selectedItem = ($elem.data("selected"))? null : elem;
 					self._trigger("onEditMarker",ev,{selected:selectedItem, all: self.marker});
-					self.options.onMarkerClick($elem);
+					self.options.onMarkerClick(selectedItem);
+				}else{
+					self.isDragging = false;
 				}
 			});	
 
@@ -314,21 +320,23 @@
 				opacity: 1, //not sure if this works
 				stack: "span", //Ensures whatever marker that is being dragged will appear on top of all other markers ie: z-index
 				start: function(ev, ui){
+					self.isDragging = true;
 					self.options.onDragStart({target: $(this)});
 				},
 				drag: function(ev, ui){
+					self.isDragging = true;
 					var yOffset = $(this).data("yOffset");
 					var xOffset = $(this).data("xOffset");
 
 					var rpos = $(self.img).imgViewer("viewToImg",ui.position.left+xOffset, ui.position.top+yOffset);
-					//console.log("rpos.x ="+rpos.x+", rpos.y ="+rpos.y);
-					var latLng = self.convertPercentToLatLng(rpos.x, rpos.y); console.log("lat -"+latLng.lat+", lng -"+latLng.lng);
+					var latLng = self.convertPercentToLatLng(rpos.x, rpos.y); 
 					//Update the marker's new position
 					$(this).data("relx",rpos.x).data("rely",rpos.y).data("lat",latLng.lat).data("lng",latLng.lng);
 
 					self.options.onDrag({target: $(this)});
 				},
 				stop: function(ev, ui){
+					self.isDragging = true;
 					self.options.onDragStop({target: $(this)});
 				},
 			});	
