@@ -423,4 +423,4 @@ This plugin is provided under the [MIT License](http://opensource.org/licenses/M
 * Ability to move the selected marker via textbox. If user enters a latitude or longitude that is outside that scope of the values of topLatLng and botLatLng, it will not move.
 
 ##Bugs
-- [] If zoomable is set to true, and a marker is selected while zoomed in. After the user zooms out, it becomes not draggable eventhough the jquery draggable is not disable.
+* If zoomable is set to true, and a marker is selected while zoomed in. After the user zooms out, it becomes not draggable eventhough the jquery draggable is not disable.
