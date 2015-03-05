@@ -385,7 +385,7 @@
 		},
 		
 		/*
-		 *	Delete a marker
+		 *	Delete a marker from Wayne Mogg
 		 */
 		_delete: function(elem) {
 			this.marker = this.marker.filter(function(v) { return v!== elem; });
@@ -393,6 +393,9 @@
 			$(this.img).imgViewer("update");
 		},
 
+		/*
+		 *	Delete a marker from Zhan Yap
+		 */
 		deleteMarker:function(elem){
 			this.marker = this.marker.filter(function(v) { return v.data("id")!= elem.data("id"); }); 
 			$(elem).detach();
@@ -443,27 +446,10 @@
 			});
 			$(this.img).imgViewer("update");
 		},
-		
-		/*
-		 *	Export marker to an array
-		 */
-		export: function() {
-			var marker = [];
-			$.each(this.marker, function() {
-				var $elem = $(this);
-				marker.push({
-						id: $elem.data("id"),
-						x: $elem.data("relx"),
-						y: $elem.data("rely"),
-						lat: $elem.data("lat"),
-						lng: $elem.data("lng"),
-						note: $elem.data("note"),
-						selected : $elem.data("selected")
-				});
-			});
-			return marker;
-		},
 
+		/*
+		 *	Export the marker list
+		 */
 		exportMarker:function(){
 			return this.marker;
 		},

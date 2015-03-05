@@ -156,23 +156,9 @@ $(".image").imgNotes("option", "onAdd", function() {
 });
 ```
 
-###onEdit (might delete)
-* Callback triggered by a mouseclick on the image, to insert a new marker/note, or on an exisitng marker to edit the note when the widget is in edit mode (canEdit: true). Please use the default implementation as a guide to implement a custom interface.
-* Default: Open a dialog box with a simple textarea to add/edit the note
-* Callback Arguments:
-    * ev: the click event
-    * elem: the marker DOM element
-
 ###onEditMarker
 * Callback triggered by a mouseclick on the marker, to select it or deselect it when the widget is in edit Mode (editMode: true).
 * Default : Draws a dashed border around the marker when selected, otherwise empty.
-* Callback Arguments:
-    * ev: the click event
-    * elem: the marker DOM element
-
-###onShow
-* Callback triggered by a mouseclick on an existing marker when the widget is in view mode (canEdit: false). Please use the default implementation as a guide to implement a custom interface.
-* Default: Open a dialog box to show the note
 * Callback Arguments:
     * ev: the click event
     * elem: the marker DOM element
@@ -292,9 +278,79 @@ count = $(".image").mapify("count");
 ```html
 $(".image").mapify("clear");
 ```
+###moveMarker
+* Move a marker to the position specified by the provided latitude, longitude
+* Arguments:
+	* elem: The marker to be move
+	* lat: The new latitude
+	* lng: The new longitude
+* Returns: the widget object for chainability
+* Example
+```html
+$(".image").mapify("moveMarker",$elem, 4.9,-123.45);
+```
+###getSelectedMarker
+* Goes through the list of markers and returns the marker whose's data "selected" is true
+* Arguments: non
+* Returns: the marker
+* Example
+```html
+marker = $(".image").mapify("getSelectedMarker");
+```
+###convertPercentToLatLng
+* Converts the given x and y percent into latitude and longitude based on the topLatLng and botLatLng values
+* Arguments:
+	* relx: x% (ranges from 0 to 1)
+	* rely: 1% (ranges from 0 to 1)
+* Returns: {lat: (latitude to the 6th decimal), lng: (longitude to the 6th decimal)}
+* Example
+```html
+latLng = $(".image").mapify("convertPercentToLatLng", 0.65, 0.75);
+```
+
+###convertLatLngToPercent
+* Convert the given latitude and longitude into x and y percent based on the topLatLng and botLatLng values
+* Arguments:
+	* lat: latitude  (ranges from topLatLng.lat and botLatLng.lat values)
+	* lng: longitude (ranges from topLatLng.lng and botLatLng.lng values)
+* Returns: {relx: (value from 0 to 1), rely:(value from 0 to 1)}	
+* Example
+```html
+percent = $(".image").mapify("convertLatLngToPercent", 49.432442, -123.434355);
+```
+
+###roundToX
+* Round the value to the nearest x decimal
+* Arguments:
+	* value: the float value
+	* decimals: the nearest decimal
+* Returns: the value after being rounded into the nearest decimal
+* Example
+```html
+value = $(".image").mapify("roundToX",123.33444566,6);
+```
+
+###deleteMarker
+* Deletes the given marker
+* Arguments:
+	* elem: the marker element
+* Returns: the widget object for chainability
+* Example
+```html
+$(".image").mapify("deleteMarker",marker1);
+```
+
+###exportMarker
+* Export the marker list
+* Arguments: none
+* Returns : the marker list
+* Example
+```html
+markers = $(".image").mapify("exportMarker");
+```
 
 ###resetSelected
-* Resets all marker's "selected" data to false
+* Resets all marker's "selected" data and its draggable to false.
 * Arguments: none
 * Returns : none
 * Example
@@ -326,15 +382,6 @@ $img.mapify("importLatLng", [
     {lat: 49.285524, lng:-123.118718, note:"Cactus Club"},
     {lat:49.285022 , lng: -123.118267, note:"Brandi Show Lounge"}
 ]);
-```
-
-###export
-* Export markers in the widget to a javascript array
-* Arguments: none
-* Returns - a javascript array of marker objects: javascript [{ x: relative x image coordinate, y: relative y image coordinate, note: the note text }, ... ] 
-* Example:
-```html
-markers = $(".image").mapify("export");
 ```
 
 ###panTo
