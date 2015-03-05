@@ -11,7 +11,6 @@
 			zoom: 1,
 			zoomStep: 0.1,
 			zoomable: true,
-			//canEdit: false,  //If this is true you can add/move/delete markers, else you can only view it.
 			editMode: false, //If this is true you can add/move/delete markers, else you can only view it.
 			topLatLng: {
 				lat:0, 
@@ -26,7 +25,7 @@
 				lng:0.5,
 				note:"Default note."
 			}],
-			marker: {
+			markerSrc: {
 				src:"marker_black.png",
 				width:27,
 				height:40,
@@ -42,116 +41,53 @@
 			onAdd: function() {
 				this.options.vAll = "bottom";
 				this.options.hAll = "middle";
-				return  $(document.createElement('span')).addClass("marker notSelected").html(this.markerCount);
+				return  $(document.createElement('span')).addClass("marker").html(this.markerCount);
 			},
-/*
- *	Default callback when the marker is clicked and the widget has canEdit = true
- *	Opens a dialog with a textarea to write a note.
- *	See the examples for a more elaborate alternative that includes a WYSIWYG editor
- */
-			onEdit: function(ev, elem) {
-				var $elem = $(elem);
-				$('#NoteDialog').remove();
-				return $('<div id="NoteDialog"></div>').dialog({
-					title: "Note Editor",
-					resizable: false,
-					modal: true,
-					height: "300",
-					width: "450",
-					position: { my: "left bottom", at: "right top", of: elem},
-					buttons: {
-						"Save": function() {
-							var txt = $('textarea', this).val();
-//			Put the editied note back into the data area of the element
-//			Very important that this step is included in custom callback implementations
-							$elem.data("note", txt);
-							$(this).dialog("close");
-						},
-						"Delete": function() {
-							$elem.trigger("remove");
-							$(this).dialog("close");
-						},
-						Cancel: function() {
-							$(this).dialog("close");
-						}
-					},
-					open: function() {
-						$(this).css("overflow", "hidden");
-						var textarea = $('<textarea id="txt" style="height:100%; width:100%;">');
-						$(this).html(textarea);
-//			Get the note text and put it into the textarea for editing
-						textarea.val($elem.data("note"));
-					}
-				});				
-			},
-			onEditMarker:function(ev,elem){ //testing, remove when done
-				console.log(elem);
-				var $elem = $(elem.selected);
-				var $allElem = $(elem.all); 
-				var toggle = elem.toggle;
-				var $img = $(this.img);
 
+			/*
+			 * Handles the onClick Marker's changes in data and CSS
+			 */
+			onEditMarker:function(ev,elem){ 
+				var $elem = $(elem.selected); console.log("marker selected is id = "+$elem.data("id"));
+				var $markerList = $(elem.all); console.log($markerList);
+				var $img = $(this.img);
+				
 				//Reset all previous "selected" data on the markers
-				$.each($allElem, function() { 
+				$.each($markerList, function() { 
 					var $elem1 = $(this);
-					$elem1.data("selected",false);
 					var pos = $img.imgViewer("imgToView",$elem1.data("relx"),$elem1.data("rely"));
-					if(pos){
-						if($elem1.data("id")==$elem.data("id")){ console.log("Enable dragging for marker "+$elem.data("id"));
+					if(pos){ //This makes sure the marker is inside the viewport
+						//$elem1.draggable("enable");
+						$elem1Id = $elem1.data("id");
+						$elemId = $elem.data("id"); console.log("comparing marker "+$elemId+" with marker "+$elem1Id);
+						if($elem1.data("id") === $elem.data("id")){ console.log("Enable dragging for marker "+$elem1Id);
 							$elem1.data("selected",true);
 							//Enable dragging
 							$elem1.draggable("enable");
-							$elem1.removeClass("notSelected");
 							$elem1.addClass("selected");
-						}else{
+						}else{ console.log("Disable dragging for marker "+$elem1Id);
+							$elem1.data("selected",false);
 							//Disable dragging
 							$elem1.draggable("disable");
 							$elem1.removeClass("selected");
-							$elem1.addClass("notSelected");
 						}
 					}
 				});
-
-				console.log("selected marker - "+$elem.data("id"));
+				console.log("------------------Done comparing------------------");
+				//console.log("selected marker - "+$elem.data("id"));
 			},
-			onDragStart:function(){ console.log("on drag start");
+			onDragStart:function(e){ 
 				//Nothing by default
 			},
-			onDrag:function(){ console.log("on drag");
+			onDrag:function(e){
 				//Nothing by default
 			},
-			onDragStop:function(){ console.log("on drag stop");
+			onDragStop:function(e){
 				//Nothing by default
 			},
-/*
- *	Default callback when the marker is clicked and the widget has canEdit = false
- *	Opens a dialog displaying the contents of the marker's note
- *	See examples for alternatives such as using tooltips.
- */
-			onShow: function(ev, elem) {
-				var $elem = $(elem);
-				$('#NoteDialog').remove();
-				return $('<div id="NoteDialog"></div>').dialog({
-					modal: false,
-					resizable: false,
-					height: 300,
-					width: 250,
-					position: { my: "left bottom", at: "right top", of: elem},
-					buttons: {
-						"Close" : function() {
-							$(this).dialog("close");
-						}
-					},
-					open: function() {
-//Get the note text and put it into the textarea for editing
-						$(this).html($elem.data("note"));
-						$(this).closest(".ui-dialog").find(".ui-dialog-titlebar:first").hide();
-						
-					},
-					close: function() {
-						$(this).dialog("destroy");
-					}
-				});
+			onMarkerClick:function(e){
+				//Default onMarkerClick
+				console.log("default on marker click");
 			},
 
 			/*
@@ -164,11 +100,11 @@
 				if (pos) {
 					$elem.css({
 						//Marker's CSS property
-						'background-image': 'url('+this.options.marker.src+')',
-						'font-size':this.options.marker.textSize+'px',
-						color:this.options.marker.textColor,
-						width:this.options.marker.width+"px",
-						height:this.options.marker.height+"px",
+						'background-image': 'url('+this.options.markerSrc.src+')',
+						'font-size':this.options.markerSrc.textSize+'px',
+						color:this.options.markerSrc.textColor,
+						width:this.options.markerSrc.width+"px",
+						height:this.options.markerSrc.height+"px",
 						left: (pos.x - $elem.data("xOffset")),
 						top: (pos.y - $elem.data("yOffset")),
 					});
@@ -178,7 +114,7 @@
 			/*
 			 *	Default callback when the image view is repainted
 			 */
-			onUpdate: function() { console.log("update");
+			onUpdate: function() {
 				var self = this;
 				$.each(this.marker, function() {
 					self.options.onUpdateMarker.call(self, this);
@@ -201,6 +137,9 @@
 			self.img = self.element[0];
 			var $img = $(self.img);
 
+			//Boolean to prevent mouseUp from triggering onClick when dragging finishes
+			self.isDragging = false;
+
 			//Set the lat lng for top left and bottom right of image
 			var $topLat = $('#topLeftLat'); 
 			$topLat.val(self.options.topLatLng.lat);
@@ -219,9 +158,8 @@
 									ev.preventDefault();
 									var rpos = imgv.cursorToImg(ev.pageX, ev.pageY); console.log(rpos);
 									if (rpos) {
-										var elem = self.addMarker(rpos.x, rpos.y);
-										//self._trigger("onEdit", ev, elem);
-										//self._trigger("onEditMarker",ev,elem);
+										var latLng = self.convertPercentToLatLng(rpos.x, rpos.y);
+										var elem = self.addMarker(rpos.x, rpos.y, latLng.lat, latLng.lng, "");
 										self.options.onUpdate.call(self); //Repaint after adding a marker
 									}
 								}
@@ -235,7 +173,7 @@
 							zoomable: self.options.zoomable
 			});
 
-			//Have the image a droppable object so that markers can be dropped after dragging.
+			//Have the image a droppable object so that markers can be dropped onto it.
 			$img.droppable({
 				drop: function(ev,ui){
 					var yOffset = ui.draggable.data("yOffset");
@@ -243,8 +181,9 @@
 
 					var rpos = $(self.img).imgViewer("viewToImg",ui.position.left+xOffset, ui.position.top+yOffset);
 
+					var latLng = self._trigger("convertPercentToLatLng", rpos.x, rpos.y);
 					//Update the marker's new position
-					ui.draggable.data("relx",rpos.x).data("rely",rpos.y);
+					ui.draggable.data("relx",rpos.x).data("rely",rpos.y).data("lat",latLng.lat).data("lng",latLng.lng);
 				}
 			});	
 
@@ -263,20 +202,61 @@
 			$.Widget.prototype.destroy.call(this);
 		},
 
+		moveMarker:function(elem, lat, lng){ 
+			var self = this;
+			console.log("moving marker "+elem.data("id")+" to ("+lat+","+lng+")");
+
+			var rel = self.convertLatLngToPercent(lat,lng);
+
+			//Update the marker's new position
+			elem.data("relx",rel.relx).data("rely",rel.rely).data("lat",lat).data("lng",lng);
+			//console.log("moved marker to %("+rel.relx+","+rel.rely+")");
+			$(self.img).imgViewer("update");
+		},
+
+		getSelectedMarker:function(){
+			var self = this;
+			var elem = null;
+			$.each(self.marker, function(){
+				var $elem = $(this);
+				if($elem.data("selected")){ console.log("found 1 = "+$elem.data("id")); console.log($elem);
+					elem = $elem;
+				}
+			});
+			return elem;
+		},
+
 		/*
-		 * Resets "selected"'s data and the css for all markers
+		 * Resets every marker's "selected"'s data, disable dragging, and its CSS
 		 */
 		resetSelected:function(){ console.log("reseting selected");			
 			var self = this;
-			
-			$.each(self.marker, function() { 
+			$.each(self.marker, function(){
 				var $elem = $(this);
 				$elem.data("selected",false);
 				$elem.removeClass("selected");
-				$elem.addClass("notSelected");
+				$elem.draggable("disable");
 			});
 		},
 		
+		convertPercentToLatLng:function(relx, rely){
+			var self = this;
+			var lat = relx * (self.options.botLatLng.lat - self.options.topLatLng.lat) + self.options.topLatLng.lat;
+			var lng = rely * (self.options.botLatLng.lng - self.options.topLatLng.lng) + self.options.topLatLng.lng;
+			return {lat: this.roundToX(lat,6), lng: this.roundToX(lng,6)};
+		},
+
+		convertLatLngToPercent:function(lat, lng){
+			var self = this;
+			var relx = (lat - self.options.topLatLng.lat)/(self.options.botLatLng.lat - self.options.topLatLng.lat);
+			var rely = (lng - self.options.topLatLng.lng)/(self.options.botLatLng.lng - self.options.topLatLng.lng);
+			return {relx: relx, rely: rely};
+		},
+
+		roundToX:function(value, decimals){
+			return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+		},
+
 		_setOption: function(key, value) {
 			switch(key) {
 				case 'vAll':
@@ -323,55 +303,75 @@
 		/*
 		 *	Add a marker
 		 */
-		addMarker: function(relx, rely, text) { console.log("adding marker");
+		addMarker: function(relx, rely, lat, lng, text) { console.log("adding marker");
 			var self = this;
 			self.markerCount++;
 			var elem = this.options.onAdd.call(this);
 			var $elem = $(elem);
 			$(this.img).imgViewer("addElem",elem);
-			$elem.data("relx", relx).data("rely", rely).data("note", text).data("selected",false).data("id",self.markerCount);
+			$elem.data("relx", relx)
+				.data("rely", rely)
+				.data("lat", lat)
+				.data("lng", lng)
+				.data("note", text)
+				.data("selected",false)
+				.data("id",self.markerCount);
 			
 			switch (this.options.vAll) {
 				case "top": $elem.data("yOffset", 0); break;
-				case "bottom": $elem.data("yOffset", self.options.marker.height); break;
-				default: $elem.data("yOffset", Math.round(self.options.marker.height/2));
+				case "bottom": $elem.data("yOffset", self.options.markerSrc.height); break;
+				default: $elem.data("yOffset", Math.round(self.options.markerSrc.height/2));
 			}
 			switch (this.options.hAll) {
 				case "left": $elem.data("xOffset", 0); break;
-				case "right": $elem.data("xOffset", self.options.marker.width); break;
-				default: $elem.data("xOffset", Math.round(self.options.marker.width/2));
+				case "right": $elem.data("xOffset", self.options.markerSrc.width); break;
+				default: $elem.data("xOffset", Math.round(self.options.markerSrc.width/2));
 			}
 			//Handle onClick on markers
 			$elem.click(function(ev) {
 				ev.preventDefault();
-				if (self.options.editMode) {
-					//self._trigger("onEdit", ev, elem);
-					console.log("there are a total of "+self.marker.length+" markers");
-					
-					var selectedItem = (elem.data("selected"))? null : elem;
-					self._trigger("onEditMarker",ev,{all:self.marker, selected:selectedItem});
-				} else {
-					//self._trigger("onShow", ev, elem);
+				if (self.options.editMode && !self.isDragging) {
+					var selectedItem = ($elem.data("selected"))? null : elem;
+					self._trigger("onEditMarker",ev,{selected:selectedItem, all: self.marker});
+					self.options.onMarkerClick(selectedItem);
+				}else{
+					self.isDragging = false;
 				}
 			});	
 
 			//Handle dragging (default to disabled)
 			$elem.draggable({
-				//containment:".viewport",
 				addClasses: false,
 				cursor: "pointer",
-				disabled: false,
+				//disabled: false,
 				opacity: 1, //not sure if this works
 				stack: "span", //Ensures whatever marker that is being dragged will appear on top of all other markers ie: z-index
-				start: this.options.onDragStart,
-				drag: this.options.onDrag,
-				stop: this.options.onDragStop,
+				start: function(ev, ui){
+					self.isDragging = true;
+					self.options.onDragStart({target: $(this)});
+				},
+				drag: function(ev, ui){
+					self.isDragging = true;
+					var yOffset = $(this).data("yOffset");
+					var xOffset = $(this).data("xOffset");
+
+					var rpos = $(self.img).imgViewer("viewToImg",ui.position.left+xOffset, ui.position.top+yOffset);
+					var latLng = self.convertPercentToLatLng(rpos.x, rpos.y); 
+					//Update the marker's new position
+					$(this).data("relx",rpos.x).data("rely",rpos.y).data("lat",latLng.lat).data("lng",latLng.lng);
+
+					self.options.onDrag({target: $(this)});
+				},
+				stop: function(ev, ui){
+					self.isDragging = true;
+					self.options.onDragStop({target: $(this)});
+				},
 			});	
-			$elem.draggable("disable");
+			$elem.draggable("disable"); //disabled by default
 			$elem.on("remove", function() {
 				self._delete(elem);
 			});
-//			self.options.onUpdateMarker.call(self, elem);
+			//self.options.onUpdateMarker.call(self, elem);
 			
 			self.marker.push(elem);
 			return elem;
@@ -385,12 +385,21 @@
 		},
 		
 		/*
-		 *	Delete a marker
+		 *	Delete a marker from Wayne Mogg
 		 */
 		_delete: function(elem) {
 			this.marker = this.marker.filter(function(v) { return v!== elem; });
 			$(elem).remove();
 			$(this.img).imgViewer("update");
+		},
+
+		/*
+		 *	Delete a marker from Zhan Yap
+		 */
+		deleteMarker:function(elem){
+			this.marker = this.marker.filter(function(v) { return v.data("id")!= elem.data("id"); }); 
+			$(elem).detach();
+			$(this.img).imgViewer("update"); console.log("after deleting 1 marker, there is "+this.marker.length+" markers left");
 		},
 		
 		/*
@@ -433,25 +442,25 @@
 				
 				console.log("x% = "+percentX+", y% = "+percentY);
 				console.log("----------------------------------------");
-				self.addMarker(percentX,percentY,this.note);
+				self.addMarker(percentX, percentY, this.lat, this.lng, this.note);
 			});
 			$(this.img).imgViewer("update");
 		},
-		
+
 		/*
-		 *	Export marker to an array
+		 *	Export the marker list
 		 */
-		export: function() {
-			var marker = [];
-			$.each(this.marker, function() {
+		exportMarker:function(){
+			return this.marker;
+		},
+
+		printSelected: function(){ //Debug only
+			$.each(this.marker,function(){
 				var $elem = $(this);
-				marker.push({
-						x: $elem.data("relx"),
-						y: $elem.data("rely"),
-						note: $elem.data("note")
-				});
+				console.log("Marker id = "+$elem.data("id")+" has selected = "+$elem.data("selected")+", draggable is disabled : "+$elem.draggable("option","disabled"));
 			});
-			return marker;
-		}
+		},
+
+
 	});
 })(jQuery);
