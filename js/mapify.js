@@ -202,9 +202,29 @@
 			$.Widget.prototype.destroy.call(this);
 		},
 
-		/*moveMarker:function(elem, lat, lng){
+		moveMarker:function(elem, lat, lng){ 
+			var self = this;
+			console.log("moving marker "+elem.data("id")+" to ("+lat+","+lng+")");
 
-		},*/
+			var rel = self.convertLatLngToPercent(lat,lng);
+
+			//Update the marker's new position
+			elem.data("relx",rel.relx).data("rely",rel.rely).data("lat",lat).data("lng",lng);
+			//console.log("moved marker to %("+rel.relx+","+rel.rely+")");
+			$(self.img).imgViewer("update");
+		},
+
+		getSelectedMarker:function(){
+			var self = this;
+			var elem = null;
+			$.each(self.marker, function(){
+				var $elem = $(this);
+				if($elem.data("selected")){ console.log("found 1 = "+$elem.data("id")); console.log($elem);
+					elem = $elem;
+				}
+			});
+			return elem;
+		},
 
 		/*
 		 * Resets every marker's "selected"'s data, disable dragging, and its CSS
@@ -224,6 +244,13 @@
 			var lat = relx * (self.options.botLatLng.lat - self.options.topLatLng.lat) + self.options.topLatLng.lat;
 			var lng = rely * (self.options.botLatLng.lng - self.options.topLatLng.lng) + self.options.topLatLng.lng;
 			return {lat: this.roundToX(lat,6), lng: this.roundToX(lng,6)};
+		},
+
+		convertLatLngToPercent:function(lat, lng){
+			var self = this;
+			var relx = (lat - self.options.topLatLng.lat)/(self.options.botLatLng.lat - self.options.topLatLng.lat);
+			var rely = (lng - self.options.topLatLng.lng)/(self.options.botLatLng.lng - self.options.topLatLng.lng);
+			return {relx: relx, rely: rely};
 		},
 
 		roundToX:function(value, decimals){
@@ -340,7 +367,7 @@
 					self.options.onDragStop({target: $(this)});
 				},
 			});	
-			$elem.draggable("disable");
+			$elem.draggable("disable"); //disabled by default
 			$elem.on("remove", function() {
 				self._delete(elem);
 			});

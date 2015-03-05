@@ -10,7 +10,7 @@
 		<!--<script type="text/javascript" src="../libs/jquery.fs.zoetrope.min.js"></script> used for polyfill and polyline-->
 		<script type="text/javascript" src="js/toe.min.js"></script>
 		<script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
-		<script type="text/javascript" src="js/imgViewer.js"></script> <!-- Should be minimized version when deployed-->
+		<script type="text/javascript" src="js/imgViewer.min.js"></script> <!-- Should be minimized version when deployed-->
 		<script type="text/javascript" src="js/mapify.js"></script>
 	</head>
 	<body>
@@ -120,14 +120,24 @@
 				});
 
 				//Handles input mode for selected marker
-				$markerLat.keypress(function(event){ console.log(String.fromCharCode(event.which));
+				$markerLat.keyup(function(event){ 
 					if(event.which != 46 && event.which != 8 && isNaN(String.fromCharCode(event.which))){
             			event.preventDefault();
+        			}else{
+        				var $elem = $img.mapify("getSelectedMarker");
+        				if($elem != null){
+        					$img.mapify("moveMarker", $elem, $markerLat.val(), $markerLng.val());
+        				}
         			}
 				});
-				$markerLng.keypress(function(event){
+				$markerLng.keyup(function(event){
 					if(event.which != 46 && event.which != 8 && isNaN(String.fromCharCode(event.which))){
             			event.preventDefault();
+        			}else{
+    					var $elem = $img.mapify("getSelectedMarker");
+        				if($elem != null){
+        					$img.mapify("moveMarker", $elem, $markerLat.val(), $markerLng.val());
+        				}
         			}
 				});
 		  	});
