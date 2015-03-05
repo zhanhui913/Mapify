@@ -415,6 +415,12 @@ This plugin is provided under the [MIT License](http://opensource.org/licenses/M
 * Can drag and drop marker, but have to select the marker first.
 * Drop marker into the correct latitude and longitude and have it remain there after redrawing.
 
+###0.4
+* Abiility to delete selected marker
+* Ability to display selected marker's latitude and longitude into a textbox as it is being drag in real time.
+* Ability to display selected marker's latitude and longitude into a textbox as it is clicked on.
+	* If no marker is selected, that textbox is empty
+* Ability to move the selected marker via textbox. If user enters a latitude or longitude that is outside that scope of the values of topLatLng and botLatLng, it will not move.
 
-
-
+##Bugs
+- [] If zoomable is set to true, and a marker is selected while zoomed in. After the user zooms out, it becomes not draggable eventhough the jquery draggable is not disable.
